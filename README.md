@@ -30,6 +30,7 @@ assign ICD10 codes from the freely available de-identified patient records in th
 to study this task from NonAI to Deeplearning models.
 
 <h2> MIMIC III dataset </h2>
+
 > MIMIC III descriptive statistics
 <table>
  <tr>
