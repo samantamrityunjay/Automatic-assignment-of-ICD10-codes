@@ -9,19 +9,21 @@ This project is part of MS thesis conducted at AlgoAnalytics
  <li> Method and Algorithm </li>
  <li> Results </li>
  </ul>
+ <li> Logistic Regression </li>
+ <li> Deeplearning Model </li>
 </ul>
 
 <h2> About ICD coding </h2>
 The International Classification of Diseases (ICD) is a globally used diagnostic tool for epidemiology,health
 management and clinical purposes which lists different dieseases, injuries and procedures carried out in the
-patients in a hierarchical manner. These codes are maintained, reglarly revised and maintained by WHO.
+patients in a hierarchical manner. These codes are maintained, reglarly revised and maintained by WHO. <br>
 These codes are necessary for maintaing electronic health records (EHR), billing and insurance claims and patient
 management. Therfore correct assignment of these codes are not only important for patient health but also of
-their economic importance.
+their economic importance.<br>
 In today's ever growing health industry, the process should not be only accurate but fast. However the coding
 process is very tedious and requires extensive training of the medical coders. Therefore the automatic prediction
 of ICD codes from unstructured medical text would benefit human coders to save time, eliminate errors and
-minimize costs.
+minimize costs. <br>
 The latest revision of ICD codes are ICD10. The codes are hierarchical. Every code has a top level category
 labelled as "ICD category" and a specifc code labelled as "ICD code". The goal of this project is to
 assign ICD10 codes from the freely available de-identified patient records in the MIMIC III database. We plan
