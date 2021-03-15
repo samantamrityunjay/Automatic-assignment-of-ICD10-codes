@@ -1,0 +1,4 @@
+pandas==1.1.5
+lightgbm==2.2.3
+streamlit==0.78.0
+scikit_learn==0.24.1
