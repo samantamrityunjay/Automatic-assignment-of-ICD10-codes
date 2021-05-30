@@ -1,4 +1,9 @@
+nltk==3.2.5
 pandas==1.1.5
 lightgbm==2.2.3
-streamlit==0.78.0
-scikit_learn==0.24.1
+numpy==1.19.5
+torch==1.8.1+cu101
+transformers==4.6.1
+scikit_learn==0.24.2
+streamlit==0.82.0
+pre-commit
