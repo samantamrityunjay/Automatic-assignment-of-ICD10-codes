@@ -2,3 +2,5 @@ Data/
 *.gslides
 *.gsheet
 *.gdoc
+__pycache__
+Presentations
