@@ -1,165 +1,52 @@
-<h1> Explainable AI: ICDcoding </h1>
-This project is part of MS thesis conducted at AlgoAnalytics
-<h2> Table of contents </h2>
-<ul>
-<li>ICD coding </li>
-<li>MIMIC III dataset</li>
-<li> Non-AI method </li>
- <ul>
- <li> Method and Algorithm </li>
- <li> Results </li>
- </ul>
- <li> Logistic Regression </li>
- <li> Deeplearning Model </li>
-</ul>
+# Automatic Assignment of ICD codes
 
-<h2> About ICD coding </h2>
-The International Classification of Diseases (ICD) is a globally used diagnostic tool for epidemiology,health
-management and clinical purposes which lists different dieseases, injuries and procedures carried out in the
-patients in a hierarchical manner. These codes are maintained, reglarly revised and maintained by WHO. <br>
-These codes are necessary for maintaing electronic health records (EHR), billing and insurance claims and patient
-management. Therfore correct assignment of these codes are not only important for patient health but also of
-their economic importance.<br>
-In today's ever growing health industry, the process should not be only accurate but fast. However the coding
-process is very tedious and requires extensive training of the medical coders. Therefore the automatic prediction
-of ICD codes from unstructured medical text would benefit human coders to save time, eliminate errors and
-minimize costs. <br>
-The latest revision of ICD codes are ICD10. The codes are hierarchical. Every code has a top level category
-labelled as "ICD category" and a specifc code labelled as "ICD code". The goal of this project is to
-assign ICD10 codes from the freely available de-identified patient records in the MIMIC III database. We plan
-to study this task from NonAI to Deeplearning models.
+## Introduction
+This repo contains codes for assignment of ICD codes to medical/clinical text. Data used here is the MIMICIII dataset. Different models have been tried from linear machine learning models to state of the art pretrained NLP model BERT.
 
-<h2> MIMIC III dataset </h2>
+## Structure of the project
 
-> MIMIC III descriptive statistics
-<table>
- <tr>
-  <th>Dataset</th>
-  <th>Hospital Admissions</th>
-  <th>ICD9 codes</th>
-  <th>ICD9 categories</th>
- </tr>
- <tr>
-  <td> Full MIMIC III </td>
-  <td> 58929 </td>
-  <td> 6984 </td>
-  <td> 1070 </td>
- </tr>
- <tr>
-  <td> NOTEEVENTS </td>
-  <td> 58329 </td>
-  <td> 6967 </td>
-  <td> 1070 </td>
- </tr>
- <tr>
-  <td> Discharge Summaries </td>
-  <td> 52722 </td>
-  <td> 6919 </td>
-  <td> 1069 </td>
- </tr>
-</table>
+At the root of the project, you will have:
 
-> ICD code and category descriptive statistics
-<table>
- <tr>
-  <td>
-   <table>
-    <tr>
-     <th>Frequency</th>
-     <th>AdmIds</th>
-     <th>%cover</th>
-    </tr>
-    <tr>
-     <td>Top10</td>
-     <td>40562</td>
-     <td>76.93%</td>
-    </tr>
-    <tr>
-     <td>Top20</td>
-     <td>43958</td>
-     <td>83.37%</td>
-    </tr>
-    <tr>
-     <td>Top50</td>
-     <td>49534</td>
-     <td>93.95%</td>
-    </tr>
-    <tr>
-     <td>Top100</td>
-     <td>50625</td>
-     <td>96.02%</td>
-    </tr>
-   </table>
-  </td>
-  <td>
-   <table>
-    <tr>
-     <th>Frequency</th>
-     <th>AdmIds</th>
-     <th>%cover</th>
-    </tr>
-    <tr>
-     <td>Top10</td>
-     <td>44410</td>
-     <td>84.42%</td>
-    </tr>
-    <tr>
-     <td>Top20</td>
-     <td>46089</td>
-     <td>87.41%</td>
-    </tr>
-    <tr>
-     <td>Top50</td>
-     <td>49534</td>
-     <td>96.55%</td>
-    </tr>
-    <tr>
-     <td>Top100</td>
-     <td>52007</td>
-     <td>98.64%</td>
-    </tr>
-   </table>
-  </td>
- </tr>
-</table>
- 
+- **main.py**: used for training and testing different models
+- **requirements.txt**: contains the minimum dependicies for running the project
+- **w2vmodel.model**: gensim word2vec model trained on MIMICIII discharge summaries
+- **src**: a folder that contains:
+  - **bert**: contains utilities and files for pretrained bert model
+  - **cnn**: contains utilities and files for CNN model
+  - **hybrid**: contains utilities and files for the hybrid model (LSTM+CNN) model
+  - **rnn**: contains utilities and files for LSTM and GRU models
+  - **ovr**: contains utilities and files for different Machine Learning Models (like LR, SVM, NaiveBayes)
+  - **fit.py**: training code for both LSTM and CNN models
+  - **test_results.py**: inferencing code for trained model used for both LSTM and CNN models
+  - **utils.py**: genearal utility codes used for all the models
 
-<table>
- <tr>
-  <th> Dataset </th>
-  <th> Hospital Admissions </th>
-  <th> ICD9 PCS codes </th>
- </tr>
- <tr>
-  <td> Full MIMIC III dataset </td>
-  <td> 52243 </td>
-  <td> 2009</td>
- </tr>
- <tr>
-  <td> Discharge summaries </td>
-  <td> 52726 </td>
-  <td> 1989 </td>
- </tr>
-</table>
-<table>
- <tr>
-  <th> Data </th>
-  <th> Hospital Admissions </th>
-  <th>  % coverage </th>
- </tr>
- <tr>
-  <td> Top 10 ICD9 PCS codes </td>
-  <td> 33304 </td>
-  <td> 71.10 </td>
- </tr>
- <tr>
-  <td> Top 20 ICD9 PCS codes </td>
-  <td> 37931 </td>
-  <td> 80.98 </td>
- </tr>
- <tr>
-  <td> Top 50 ICD9 PCS codes </td>
-  <td> 40493 </td>
-  <td> 86.45</td>
- </tr>
-</table>
+## Dependencies
+ The dependicies are mentioned in the `requirements.txt` file.
+ They can be installed by:
+ ```bash
+pip install -r requirements.txt
+```
+
+## How to use the code
+
+Launch train.py with the following arguments:
+
+- `train_path`: path of the traianing data. 
+- `test_path`: path of the test data
+- `model_name`: one of the 5 models impleamrnted ['bert', 'hybrid', 'lstm', 'gru', 'cnn', 'ovr']. Default to 'bert'
+- `icd_type`: training on different types of icd labels, ['icd9cat', 'icd9code', 'icd10cat', 'icd10code']. Default to 'icd9cat'
+- `epochs`: number of epochs 
+- `batch_size`: batch size, default to 16 (for bert model).
+- `learning_rate`: default to 2e-5 (for bert model)
+- `w2vmodel`: path for pretrained gensim word2vec model.
+
+***Example***
+```bash
+python main.py --train_path train.csv --test_path test.csv --model_name cnn
+```
+
+## Data
+The data used for training can be downloaded from:
+- [train data](https://drive.google.com/file/d/1--ZVpt614neHN9erxmsg6s6aGInThJ22/view?usp=sharing)
+- [test data](https://drive.google.com/file/d/1-4tp0og0I7KyNMoqF2_t1smu0_GqQCVf/view?usp=sharing)
+
