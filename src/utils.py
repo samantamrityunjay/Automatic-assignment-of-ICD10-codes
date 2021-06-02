@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import accuracy_score,hamming_loss,precision_score,recall_score,f1_score,classification_report
-
+from torch.utils.data import SubsetRandomSampler, DataLoader
 import re
 import nltk
 import string
@@ -73,6 +73,19 @@ def split_indices(dataset, validation_split, shuffle_dataset = True, random_seed
     np.random.seed(random_seed)
     np.random.shuffle(indices)
   return indices[split:], indices[:split]
+#########################################################################################
+
+#########################################################################################
+def dataloader(train_dataset, test_dataset, batch_size, val_split):
+  train_indices, val_indices = split_indices(train_dataset, val_split)
+  train_sampler = SubsetRandomSampler(train_indices)
+  val_sampler = SubsetRandomSampler(val_indices)
+  train_loader = DataLoader(train_dataset, batch_size = batch_size, sampler=train_sampler)
+  val_loader = DataLoader(train_dataset, batch_size = batch_size, sampler=val_sampler)
+  test_loader = DataLoader(test_dataset, batch_size= batch_size)
+  return train_loader, val_loader, test_loader
+
+
 #########################################################################################
 
 #########################################################################################
