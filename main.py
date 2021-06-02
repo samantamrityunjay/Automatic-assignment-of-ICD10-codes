@@ -4,8 +4,8 @@ import argparse
 from ast import literal_eval 
 import torch 
 import torch.nn as nn
-from torch.utils.data import SubsetRandomSampler, DataLoader
 from gensim.models import Word2Vec
+import logging
 
 from src.bert.bert_model import BERTclassifier
 from src.bert.bert_dataset import BERTdataset
@@ -33,7 +33,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from src.fit import fit
 from src.test_results import test_results
 
-from src.utils import split_indices
+from src.utils import dataloader
 
 def data(args):
     train_diagnosis = pd.read_csv(args.train_path)
@@ -62,13 +62,14 @@ def run(args):
     torch.backends.cudnn.benchmark = False
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
     
-    if args.model_name == "bert":
-
-        print("Model Name: BERT")
-
-        print("Device: ", device)
+    logging.basicConfig(filename='train.log', filemode = 'w', level=logging.DEBUG)
+    logging.info("Model Name: %s", args.model_name.upper())
+    logging.info("Device: %s", device)
+    logging.info("Batch Size: %d", args.batch_size)
+    logging.info("Learning Rate: %f", args.learning_rate)
+    
+    if args.model_name == "bert":        
 
         learning_rate = args.learning_rate
         loss_fn = nn.BCELoss()
@@ -77,28 +78,15 @@ def run(args):
         bert_train_dataset = BERTdataset(train_diagnosis)
         bert_test_dataset = BERTdataset(test_diagnosis)
 
-        train_indices, val_indices = split_indices(bert_train_dataset, validation_split=2/7)
-        train_sampler = SubsetRandomSampler(train_indices)
-        val_sampler = SubsetRandomSampler(val_indices)
-
-        batch_size = args.batch_size
-        bert_train_loader = DataLoader(bert_train_dataset, batch_size = batch_size, sampler=train_sampler)
-        bert_val_loader = DataLoader(bert_train_dataset, batch_size = batch_size, sampler=val_sampler)
-        bert_test_loader = DataLoader(bert_test_dataset, batch_size= batch_size)
-
+        bert_train_loader, bert_val_loader, bert_test_loader = dataloader(bert_train_dataset, bert_test_dataset, args.batch_size, args.val_split)
+        
         model = BERTclassifier().to(device)
-
-        print("Batch Size: ", batch_size)
-        print("Learning Rate: ", learning_rate)
 
         bert_fit(args.epochs, model, bert_train_loader, bert_val_loader, args.icd_type, opt_fn, loss_fn, learning_rate, device)
         bert_test_results(model, bert_test_loader, args.icd_type, device)
     
 
     elif args.model_name == 'gru':
-        print("Model Name: gru")
-        print("Device: ", device)
-
         learning_rate = args.learning_rate
         loss_fn = nn.BCELoss()
         opt_fn = torch.optim.Adam
@@ -107,14 +95,7 @@ def run(args):
         rnn_train_dataset = rnndataset(train_diagnosis, vocab2index)
         rnn_test_dataset = rnndataset(train_diagnosis, vocab2index)
 
-        train_indices, val_indices = split_indices(rnn_train_dataset, validation_split=2/7)
-        train_sampler = SubsetRandomSampler(train_indices)
-        val_sampler = SubsetRandomSampler(val_indices)
-
-        batch_size = args.batch_size
-        rnn_train_loader = DataLoader(rnn_train_dataset, batch_size = batch_size, sampler=train_sampler)
-        rnn_val_loader = DataLoader(rnn_train_dataset, batch_size = batch_size, sampler=val_sampler)
-        rnn_test_loader = DataLoader(rnn_test_dataset, batch_size= batch_size)
+        rnn_train_loader, rnn_val_loader, rnn_test_loader = dataloader(rnn_train_dataset, rnn_test_dataset, args.batch_size, args.val_split)
         
 
         w2vmodel = Word2Vec.load(args.w2vmodel)
@@ -122,17 +103,11 @@ def run(args):
 
         gruw2vmodel = GRUw2vmodel(weights_matrix = weights, hidden_size = 256, num_layers = 2, device = device).to(device)
         
-        print("Batch Size: ", batch_size)
-        print("Learning Rate: ", learning_rate)
-
         fit(args.epochs, gruw2vmodel, rnn_train_loader, rnn_val_loader, args.icd_type, opt_fn, loss_fn, learning_rate, device)
         test_results(gruw2vmodel, rnn_test_loader, args.icd_type, device)
 
 
     elif args.model_name == 'lstm':
-        print("Model Name: lstm")
-        print("Device: ", device)
-
         learning_rate = args.learning_rate
         loss_fn = nn.BCELoss()
         opt_fn = torch.optim.Adam
@@ -141,14 +116,7 @@ def run(args):
         rnn_train_dataset = rnndataset(train_diagnosis, vocab2index)
         rnn_test_dataset = rnndataset(train_diagnosis, vocab2index)
 
-        train_indices, val_indices = split_indices(rnn_train_dataset, validation_split=2/7)
-        train_sampler = SubsetRandomSampler(train_indices)
-        val_sampler = SubsetRandomSampler(val_indices)
-
-        batch_size = args.batch_size
-        rnn_train_loader = DataLoader(rnn_train_dataset, batch_size = batch_size, sampler=train_sampler)
-        rnn_val_loader = DataLoader(rnn_train_dataset, batch_size = batch_size, sampler=val_sampler)
-        rnn_test_loader = DataLoader(rnn_test_dataset, batch_size= batch_size)
+        rnn_train_loader, rnn_val_loader, rnn_test_loader = dataloader(rnn_train_dataset, rnn_test_dataset, args.batch_size, args.val_split)
         
 
         w2vmodel = Word2Vec.load(args.w2vmodel)
@@ -156,17 +124,12 @@ def run(args):
 
         lstmw2vmodel = LSTMw2vmodel(weights_matrix = weights, hidden_size = 256, num_layers = 2, device = device).to(device)
         
-        print("Batch Size: ", batch_size)
-        print("Learning Rate: ", learning_rate)
-
         fit(args.epochs, lstmw2vmodel, rnn_train_loader, rnn_val_loader, args.icd_type, opt_fn, loss_fn, learning_rate, device)
         test_results(lstmw2vmodel, rnn_test_loader, args.icd_type, device)
 
 
     elif args.model_name == "cnn":
-        print("Model Name: cnn")
-        print("Device: ", device)
-
+        
         learning_rate = args.learning_rate
         loss_fn = nn.BCELoss()
         opt_fn = torch.optim.Adam
@@ -174,28 +137,16 @@ def run(args):
         cnn_train_dataset = cnndataset(train_diagnosis)
         cnn_test_dataset = cnndataset(test_diagnosis)
 
-        train_indices, val_indices = split_indices(cnn_train_dataset, validation_split=2/7)
-        train_sampler = SubsetRandomSampler(train_indices)
-        val_sampler = SubsetRandomSampler(val_indices)
-
-        batch_size = args.batch_size
-        cnn_train_loader = DataLoader(cnn_train_dataset, batch_size = batch_size, sampler=train_sampler)
-        cnn_val_loader = DataLoader(cnn_train_dataset, batch_size = batch_size, sampler=val_sampler)
-        cnn_test_loader = DataLoader(cnn_test_dataset, batch_size= batch_size)
+        cnn_train_loader, cnn_val_loader, cnn_test_loader = dataloader(cnn_train_dataset, cnn_test_dataset, args.batch_size, args.val_split)
 
         model = character_cnn(cnn_train_dataset.vocabulary, cnn_train_dataset.sequence_length).to(device)
-
-        print("Batch Size: ", batch_size)
-        print("Learning Rate: ", learning_rate)
 
         fit(args.epochs, model, cnn_train_loader, cnn_val_loader, args.icd_type, opt_fn, loss_fn, learning_rate, device)
         test_results(model, cnn_test_loader, args.icd_type, device)
 
 
     elif args.model_name == 'hybrid':
-        print("Model Name: hybrid")
-        print("Device: ", device)
-
+        
         learning_rate = args.learning_rate
         loss_fn = nn.BCELoss()
         opt_fn = torch.optim.Adam
@@ -205,29 +156,19 @@ def run(args):
         hybrid_train_dataset = hybriddataset(train_diagnosis, vocab2index)
         hybrid_test_dataset = hybriddataset(train_diagnosis, vocab2index)
 
-        train_indices, val_indices = split_indices(hybrid_train_dataset, validation_split=2/7)
-        train_sampler = SubsetRandomSampler(train_indices)
-        val_sampler = SubsetRandomSampler(val_indices)
-
-        batch_size = args.batch_size
-        hybrid_train_loader = DataLoader(hybrid_train_dataset, batch_size = batch_size, sampler=train_sampler)
-        hybrid_val_loader = DataLoader(hybrid_train_dataset, batch_size = batch_size, sampler=val_sampler)
-        hybrid_test_loader = DataLoader(hybrid_test_dataset, batch_size= batch_size)
-        
+        hybrid_train_loader, hybrid_val_loader, hybrid_test_loader = dataloader(hybrid_train_dataset, hybrid_test_dataset, args.batch_size, args.val_split)
+          
 
         w2vmodel = Word2Vec.load(args.w2vmodel)
         weights = get_emb_matrix(w2vmodel, counts)
 
         model = hybrid(hybrid_train_dataset.vocabulary, hybrid_train_dataset.sequence_length, weights_matrix = weights, hidden_size = 256, num_layers = 2).to(device)
 
-        print("Batch Size: ", batch_size)
-        print("Learning Rate: ", learning_rate)
-
         hybrid_fit(args.epochs, model, hybrid_train_loader, hybrid_val_loader, args.icd_type, opt_fn, loss_fn, learning_rate, device)
         hybrid_test_results(model, hybrid_test_loader, args.icd_type, device)
 
     elif args.model_name == 'ovr':
-        print("Model Name: Onevs AllClassifier")
+       
         X_train, y_train = mlmodel_data(train_diagnosis, args.icd_type)
         X_test, y_test = mlmodel_data(test_diagnosis, args.icd_type)
 
@@ -248,18 +189,6 @@ def run(args):
 
 
         
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Automatic Assignment of Medical Codes")
 
@@ -270,6 +199,7 @@ if __name__ == "__main__":
     parser.add_argument("--icd_type", type = str, choices = ['icd9cat', 'icd9code', 'icd10cat', 'icd10code'], default = 'icd9cat')
 
     parser.add_argument("--batch_size", type = int, default = 16)
+    parser.add_argument("--val_split", type = float, default = 2/7)
     parser.add_argument("--learning_rate", type = float, default = 2e-5)
     parser.add_argument("--epochs", type = int, default = 4)
 
