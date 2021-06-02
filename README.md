@@ -37,6 +37,7 @@ Launch train.py with the following arguments:
 - `icd_type`: training on different types of icd labels, ['icd9cat', 'icd9code', 'icd10cat', 'icd10code']. Default to 'icd9cat'
 - `epochs`: number of epochs 
 - `batch_size`: batch size, default to 16 (for bert model).
+- `val_split`: validation split of the training data, default = 2/7 (train:val:split = 5:2:3)
 - `learning_rate`: default to 2e-5 (for bert model)
 - `w2vmodel`: path for pretrained gensim word2vec model.
 
