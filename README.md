@@ -8,7 +8,7 @@ This repo contains codes for assignment of ICD codes to medical/clinical text. D
 At the root of the project, you will have:
 
 - **main.py**: used for training and testing different models
-- **requirements.txt**: contains the minimum dependicies for running the project
+- **requirements.txt**: contains the minimum dependencies for running the project
 - **w2vmodel.model**: gensim word2vec model trained on MIMICIII discharge summaries
 - **src**: a folder that contains:
   - **bert**: contains utilities and files for pretrained bert model
@@ -21,7 +21,7 @@ At the root of the project, you will have:
   - **utils.py**: genearal utility codes used for all the models
 
 ## Dependencies
- The dependicies are mentioned in the `requirements.txt` file.
+ The dependencies are mentioned in the `requirements.txt` file.
  They can be installed by:
  ```bash
 pip install -r requirements.txt
@@ -31,9 +31,9 @@ pip install -r requirements.txt
 
 Launch train.py with the following arguments:
 
-- `train_path`: path of the traianing data. 
+- `train_path`: path of the training data. 
 - `test_path`: path of the test data
-- `model_name`: one of the 5 models impleamrnted ['bert', 'hybrid', 'lstm', 'gru', 'cnn', 'ovr']. Default to 'bert'
+- `model_name`: one of the 5 models implemented ['bert', 'hybrid', 'lstm', 'gru', 'cnn', 'ovr']. Default to 'bert'
 - `icd_type`: training on different types of icd labels, ['icd9cat', 'icd9code', 'icd10cat', 'icd10code']. Default to 'icd9cat'
 - `epochs`: number of epochs 
 - `batch_size`: batch size, default to 16 (for bert model).
