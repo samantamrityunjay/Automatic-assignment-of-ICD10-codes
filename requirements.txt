@@ -1,5 +1,5 @@
 nltk>=3.4.5
-numpy==1.19.5
+numpy==1.22.0
 pandas==1.1.5
 transformers==4.6.1
 gensim==3.6.0
