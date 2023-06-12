@@ -1,7 +1,7 @@
 nltk>=3.4.5
 numpy==1.19.5
 pandas==1.1.5
-transformers==4.6.1
+transformers==4.30.0
 gensim==3.6.0
 torch==1.8.1+cu101
 lightgbm==2.2.3
